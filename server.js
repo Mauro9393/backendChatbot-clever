@@ -142,8 +142,8 @@ app.post("/api/:service", async (req, res) => {
             });
 
             return res.json(response.data);
-        }
-        else {
+
+        } else {
             return res.status(400).json({ error: "Invalid service" });
         }
     } catch (error) {
@@ -169,7 +169,7 @@ app.get("/get-azure-key", (req, res) => {
         region: process.env.AZURE_REGION
     });
 });
-
+/*
 // New endpoint to retrieve the OpenAI key
 app.get("/get-openai-key", (req, res) => {
     if (!process.env.OPENAI_API_KEY_ANALYSE) {
@@ -180,7 +180,7 @@ app.get("/get-openai-key", (req, res) => {
         apiKey: process.env.OPENAI_API_KEY_ANALYSE
     });
 });
-
+*/
 // Avvia il server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
