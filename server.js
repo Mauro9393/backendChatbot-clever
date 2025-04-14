@@ -169,6 +169,37 @@ app.get("/get-azure-key", (req, res) => {
         region: process.env.AZURE_REGION
     });
 });
+
+// ✅ Endpoint sicuro per ottenere un token temporaneo Azure Speech
+app.get("/get-azure-token", async (req, res) => {
+    const apiKey = process.env.AZURE_SPEECH_API_KEY;
+    const region = process.env.AZURE_REGION;
+
+    if (!apiKey || !region) {
+        return res.status(500).json({ error: "Azure keys missing in the backend" });
+    }
+
+    try {
+        const tokenRes = await axios.post(
+            `https://${region}.api.cognitive.microsoft.com/sts/v1.0/issueToken`,
+            null,
+            {
+                headers: {
+                    "Ocp-Apim-Subscription-Key": apiKey
+                }
+            }
+        );
+
+        // Inviamo il token e la regione al frontend
+        res.json({
+            token: tokenRes.data,
+            region
+        });
+    } catch (error) {
+        console.error("Failed to generate Azure token:", error.response?.data || error.message);
+        res.status(500).json({ error: "Failed to generate token" });
+    }
+});
 /*
 // New endpoint to retrieve the OpenAI key
 app.get("/get-openai-key", (req, res) => {
