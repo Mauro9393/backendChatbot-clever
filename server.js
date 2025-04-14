@@ -158,19 +158,7 @@ app.post("/api/:service", async (req, res) => {
     }
 });
 
-// Endpoint to retrieve the Azure Speech key
-app.get("/get-azure-key", (req, res) => {
-    if (!process.env.AZURE_SPEECH_API_KEY || !process.env.AZURE_REGION) {
-        return res.status(500).json({ error: "Azure keys missing in the backend" });
-    }
-
-    res.json({
-        apiKey: process.env.AZURE_SPEECH_API_KEY,
-        region: process.env.AZURE_REGION
-    });
-});
-
-// ✅ Endpoint sicuro per ottenere un token temporaneo Azure Speech
+// Secure endpoint to obtain a temporary Azure Speech token.
 app.get("/get-azure-token", async (req, res) => {
     const apiKey = process.env.AZURE_SPEECH_API_KEY;
     const region = process.env.AZURE_REGION;
@@ -190,7 +178,7 @@ app.get("/get-azure-token", async (req, res) => {
             }
         );
 
-        // Inviamo il token e la regione al frontend
+        // We send the token and the region to the frontend.
         res.json({
             token: tokenRes.data,
             region
@@ -200,19 +188,8 @@ app.get("/get-azure-token", async (req, res) => {
         res.status(500).json({ error: "Failed to generate token" });
     }
 });
-/*
-// New endpoint to retrieve the OpenAI key
-app.get("/get-openai-key", (req, res) => {
-    if (!process.env.OPENAI_API_KEY_ANALYSE) {
-        return res.status(500).json({ error: "OpenAI API key missing in the backend" });
-    }
 
-    res.json({
-        apiKey: process.env.OPENAI_API_KEY_ANALYSE
-    });
-});
-*/
-// Avvia il server
+// Start server
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
