@@ -25,40 +25,41 @@ app.post("/api/:service", async (req, res) => {
         console.log("🔹 Dati ricevuti:", JSON.stringify(req.body));
         let apiKey, apiUrl;
 
-       /* if (service === "openaiSimulateur") {
-            apiKey = process.env.OPENAI_API_KEY_SIMULATEUR;
-            apiUrl = "https://api.openai.com/v1/chat/completions";
-
-            // Make the request to OpenAI in stream mode
-            const response = await axiosInstance.post(apiUrl, req.body, {
-                headers: {
-                    "Authorization": `Bearer ${apiKey}`,
-                    "Content-Type": "application/json"
-                },
-                responseType: 'stream'
-            });
-
-            // Set headers for SSE streaming
-            res.setHeader("Content-Type", "text/event-stream");
-            res.setHeader("Cache-Control", "no-cache");
-
-            // Forward each chunk received from the OpenAI server
-            response.data.on('data', (chunk) => {
-                res.write(chunk);
-            });
-
-            response.data.on('end', () => {
-                res.end();
-            });
-
-            response.data.on('error', (error) => {
-                console.error("Error in stream:", error);
-                res.end();
-            });
-
-            return; // Stop execution here to avoid sending further responses
-
-        }*/if (service === "openaiSimulateur") {
+        /* if (service === "openaiSimulateur") {
+             apiKey = process.env.OPENAI_API_KEY_SIMULATEUR;
+             apiUrl = "https://api.openai.com/v1/chat/completions";
+ 
+             // Make the request to OpenAI in stream mode
+             const response = await axiosInstance.post(apiUrl, req.body, {
+                 headers: {
+                     "Authorization": `Bearer ${apiKey}`,
+                     "Content-Type": "application/json"
+                 },
+                 responseType: 'stream'
+             });
+ 
+             // Set headers for SSE streaming
+             res.setHeader("Content-Type", "text/event-stream");
+             res.setHeader("Cache-Control", "no-cache");
+ 
+             // Forward each chunk received from the OpenAI server
+             response.data.on('data', (chunk) => {
+                 res.write(chunk);
+             });
+ 
+             response.data.on('end', () => {
+                 res.end();
+             });
+ 
+             response.data.on('error', (error) => {
+                 console.error("Error in stream:", error);
+                 res.end();
+             });
+ 
+             return; // Stop execution here to avoid sending further responses
+ 
+         }*/
+        if (service === "openaiSimulateur") {
             const apiKey = process.env.AZURE_OPENAI_KEY_SIMULATEUR;
             const endpoint = process.env.AZURE_OPENAI_ENDPOINT_SIMULATEUR;
             const deployment = process.env.AZURE_OPENAI_DEPLOYMENT_SIMULATEUR;
@@ -164,7 +165,7 @@ app.post("/api/:service", async (req, res) => {
                     res.status(500).json({ error: "Unknown error with ElevenLabs" });
                 }
             }
-        } else if (service === "openaiAnalyse") {
+        } /* else if (service === "openaiAnalyse") {
             apiKey = process.env.OPENAI_API_KEY_ANALYSE;
             apiUrl = "https://api.openai.com/v1/chat/completions";
 
@@ -177,7 +178,39 @@ app.post("/api/:service", async (req, res) => {
 
             return res.json(response.data);
 
-        } else {
+        }*/else if (service === "openaiAnalyse") {
+            const apiKey = process.env.AZURE_OPENAI_KEY_SIMULATEUR;
+            const endpoint = process.env.AZURE_OPENAI_ENDPOINT_SIMULATEUR;
+            const deployment = process.env.AZURE_OPENAI_DEPLOYMENT_SIMULATEUR;
+            const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
+
+            const apiUrl = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
+
+            console.log("➡️ Azure Analyse URL:", apiUrl);
+            console.log("➡️ Request body:", JSON.stringify(req.body, null, 2));
+
+            try {
+                const response = await axiosInstance.post(apiUrl, req.body, {
+                    headers: {
+                        "api-key": apiKey,
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                return res.json(response.data);
+            } catch (error) {
+                console.error("❌ Azure Analyse Error:");
+                if (error.response) {
+                    console.error("Status:", error.response.status);
+                    console.error("Data:", JSON.stringify(error.response.data, null, 2));
+                    return res.status(error.response.status).json(error.response.data);
+                } else {
+                    console.error("Message:", error.message);
+                    return res.status(500).json({ error: "Errore interno Azure Analyse" });
+                }
+            }
+        }
+        else {
             return res.status(400).json({ error: "Invalid service" });
         }
     } catch (error) {
