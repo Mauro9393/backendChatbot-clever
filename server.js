@@ -108,7 +108,8 @@ app.post("/api/:service", async (req, res) => {
             const voiceMap = {
                 "espagnol": "l1zE9xgNpUTaQCZzpNJa",
                 "français": "1a3lMdKLUcfcMtvN772u",
-                "anglais": "7tRwuZTD1EWi6nydVerp"
+                "anglais": "7tRwuZTD1EWi6nydVerp",
+                "italien": "HuK8QKF35exsCh2e7fLT"
             };
 
             const cleanLanguage = selectedLanguage ? selectedLanguage.trim().toLowerCase() : "";
