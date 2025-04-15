@@ -25,7 +25,7 @@ app.post("/api/:service", async (req, res) => {
         console.log("🔹 Dati ricevuti:", JSON.stringify(req.body));
         let apiKey, apiUrl;
 
-        if (service === "openaiSimulateur") {
+       /* if (service === "openaiSimulateur") {
             apiKey = process.env.OPENAI_API_KEY_SIMULATEUR;
             apiUrl = "https://api.openai.com/v1/chat/completions";
 
@@ -58,7 +58,41 @@ app.post("/api/:service", async (req, res) => {
 
             return; // Stop execution here to avoid sending further responses
 
-        } else if (service === "elevenlabs") {
+        }*/if (service === "openaiSimulateur") {
+            const apiKey = process.env.AZURE_OPENAI_KEY_SIMULATEUR;
+            const endpoint = process.env.AZURE_OPENAI_ENDPOINT_SIMULATEUR;
+            const deployment = process.env.AZURE_OPENAI_DEPLOYMENT_SIMULATEUR;
+            const apiVersion = process.env.AZURE_OPENAI_API_VERSION;
+
+            const apiUrl = `${endpoint}/openai/deployments/${deployment}/chat/completions?api-version=${apiVersion}`;
+
+            const response = await axiosInstance.post(apiUrl, req.body, {
+                headers: {
+                    "api-key": apiKey,
+                    "Content-Type": "application/json"
+                },
+                responseType: 'stream'
+            });
+
+            res.setHeader("Content-Type", "text/event-stream");
+            res.setHeader("Cache-Control", "no-cache");
+
+            response.data.on('data', (chunk) => {
+                res.write(chunk);
+            });
+
+            response.data.on('end', () => {
+                res.end();
+            });
+
+            response.data.on('error', (error) => {
+                console.error("Error in stream:", error);
+                res.end();
+            });
+
+            return;
+        }
+        else if (service === "elevenlabs") {
             apiKey = process.env.ELEVENLAB_API_KEY;
 
             if (!apiKey) {
